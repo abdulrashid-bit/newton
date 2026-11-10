@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResQ-Platform | Code Clash 2026 Emergency Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        severity: {
+                            critical: '#7f1d1d',
+                            high: '#991b1b',
+                            medium: '#b45309',
+                            low: '#15803d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-red-600 text-white p-2 rounded-lg font-bold flex items-center justify-center shadow-md animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-wider text-white">CODE CLASH 2026 <span class="text-xs px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full font-mono">ROUND 1</span></h1>
+                <p class="text-xs text-slate-400">Emergency Response & Disaster Management Platform</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-600 text-white transition shadow-md hover:bg-red-500">
+                <i class="fa-solid fa-chart-pie mr-2"></i> Admin Dashboard
+            </button>
+            <button onclick="switchTab('report')" id="btn-report" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition border border-slate-700">
+                <i class="fa-solid fa-bullhorn mr-2"></i> Report Emergency
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow p-6 max-w-7xl mx-auto w-full space-y-6">
+
+        <!-- TAB 1: ADMIN DASHBOARD -->
+        <section id="tab-dashboard" class="space-y-6">
+            
+            <!-- Dashboard Statistics Cards (Required by Brief) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Reported Incidents -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase">Total Reported Incidents</p>
+                            <h3 id="stat-total" class="text-3xl font-black text-white mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg"><i class="fa-solid fa-clipboard-list text-lg"></i></div>
+                    </div>
+                </div>
+                <!-- Critical Incidents -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase">Critical Incidents</p>
+                            <h3 id="stat-critical" class="text-3xl font-black text-red-500 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-red-500/10 text-red-500 rounded-lg"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+                    </div>
+                </div>
+                <!-- Pending Incidents -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase">Pending Incidents</p>
+                            <h3 id="stat-pending" class="text-3xl font-black text-amber-500 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-amber-500/10 text-amber-500 rounded-lg"><i class="fa-solid fa-clock text-lg"></i></div>
+                    </div>
+                </div>
+                <!-- Resolved Incidents -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase">Resolved Incidents</p>
+                            <h3 id="stat-resolved" class="text-3xl font-black text-emerald-400 mt-1">0</h3>
+                        </div>
+                        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-circle-check text-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents by Category Breakdown Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white mb-1"><i class="fa-solid fa-chart-bar text-red-500 mr-2"></i> Incidents by Category Breakdown</h2>
+                        <p class="text-xs text-slate-400 mb-4">Distribution across all emergency types.</p>
+                    </div>
+                    <div id="category-breakdown" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <!-- Quick Filter / Severity Overview -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white mb-1"><i class="fa-solid fa-filter text-red-500 mr-2"></i> Quick Filters</h2>
+                        <p class="text-xs text-slate-400 mb-4">Filter incident view by severity.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="filterSeverity('All')" class="bg-slate-800 hover:bg-slate-700 text-xs font-semibold py-2.5 px-3 rounded-lg border border-slate-700 text-white transition">All Severities</button>
+                        <button onclick="filterSeverity('Critical')" class="bg-red-950/40 hover:bg-red-900/50 text-xs font-semibold py-2.5 px-3 rounded-lg border border-red-900 text-red-400 transition">Critical</button>
+                        <button onclick="filterSeverity('High')" class="bg-red-900/20 hover:bg-red-900/30 text-xs font-semibold py-2.5 px-3 rounded-lg border border-red-800/40 text-red-300 transition">High</button>
+                        <button onclick="filterSeverity('Medium')" class="bg-amber-950/30 hover:bg-amber-900/40 text-xs font-semibold py-2.5 px-3 rounded-lg border border-amber-900/50 text-amber-400 transition">Medium</button>
+                        <button onclick="filterSeverity('Low')" class="bg-emerald-950/30 hover:bg-emerald-900/40 text-xs font-semibold py-2.5 px-3 rounded-lg border border-emerald-900/50 text-emerald-400 col-span-2 transition">Low</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Administrator Incident Management Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white">Reported Incidents Management</h2>
+                        <p class="text-xs text-slate-400">View details, update status, duplicate, or delete reports.</p>
+                    </div>
+                    <div>
+                        <input type="text" id="search-input" onkeyup="renderDashboard()" placeholder="Search title, location..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500 w-64">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-4">ID / Title</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Severity</th>
+                                <th class="py-3 px-4">Location</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incident-table-body" class="divide-y divide-slate-800 text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 2: REPORT INCIDENT FORM -->
+        <section id="tab-report" class="hidden max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-white">Emergency Incident Report Form</h2>
+                <p class="text-xs text-slate-400">Provide accurate details for emergency response deployment.</p>
+            </div>
+            <form id="incident-form" onsubmit="submitIncident(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Incident Title *</label>
+                        <input type="text" id="rep-title" required placeholder="e.g. Chemical Plant Fire" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Emergency Category *</label>
+                        <select id="rep-category" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                            <option value="Fire Emergency">Fire Emergency</option>
+                            <option value="Road Accident">Road Accident</option>
+                            <option value="Medical Emergency">Medical Emergency</option>
+                            <option value="Flood">Flood</option>
+                            <option value="Building Collapse">Building Collapse</option>
+                            <option value="Other Emergencies">Other Emergencies</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Severity Level *</label>
+                        <select id="rep-severity" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Number of People Affected *</label>
+                        <input type="number" id="rep-people" min="1" value="1" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Location of Incident *</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="rep-location" required placeholder="e.g. 13.0827° N, 80.2707° E" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                            <button type="button" onclick="getCurrentLocation()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 text-xs"><i class="fa-solid fa-location-crosshairs"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Optional Contact Information</label>
+                        <input type="text" id="rep-contact" placeholder="Phone or email" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Incident Description *</label>
+                    <textarea id="rep-desc" rows="3" required placeholder="Describe the emergency situation in detail..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="submit" class="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow-md transition">Submit Emergency Report</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- INCIDENT DETAIL MODAL -->
+    <div id="detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="modal-title" class="text-lg font-bold text-white">Incident Details</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="modal-content" class="space-y-2 text-sm text-slate-300">
+                <!-- Populated via JS -->
+            </div>
+            <div class="border-t border-slate-800 pt-3 flex justify-between items-center">
+                <button onclick="duplicateCurrentIncident()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg border border-slate-700 font-medium"><i class="fa-solid fa-clone mr-1"></i> Duplicate Report</button>
+                <button onclick="closeModal()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-4 py-2 rounded-lg font-semibold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let incidents = [
+            {
+                id: "INC-501",
+                title: "Multi-Storey Building Collapse",
+                category: "Building Collapse",
+                severity: "Critical",
+                peopleAffected: 25,
+                location: "Market Street Block B (13.05° N, 80.25° E)",
+                contact: "+91 98765 43210",
+                description: "Sudden structural failure during renovation. Rescue teams required immediately.",
+                status: "Pending",
+                timestamp: Date.now() - 1000 * 60 * 30
+            },
+            {
+                id: "INC-502",
+                title: "Flash Flood Warning near River Bridge",
+                category: "Flood",
+                severity: "High",
+                peopleAffected: 14,
+                location: "East Bank Bridge Area",
+                contact: "Municipal Patrol",
+                description: "Heavy overflow trapping cars and pedestrians near the lower banks.",
+                status: "In Progress",
+                timestamp: Date.now() - 1000 * 60 * 60
+            },
+            {
+                id: "INC-503",
+                title: "Severe Highway Collision",
+                category: "Road Accident",
+                severity: "Medium",
+                peopleAffected: 3,
+                location: "Expressway Km 45",
+                contact: "Anonymous",
+                description: "Two-car crash obstructing traffic lanes. Medical assistance dispatched.",
+                status: "Resolved",
+                timestamp: Date.now() - 1000 * 60 * 120
+            }
+        ];
+
+        let activeModalId = null;
+        let selectedSeverityFilter = 'All';
+
+        function switchTab(tab) {
+            ['dashboard', 'report'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('bg-red-600', 'text-white');
+                document.getElementById(`btn-${t}`).classList.add('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.remove('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+            document.getElementById(`btn-${tab}`).classList.add('bg-red-600', 'text-white');
+            if(tab === 'dashboard') renderDashboard();
+        }
+
+        function filterSeverity(sev) {
+            selectedSeverityFilter = sev;
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            // Metrics Calculations
+            const total = incidents.length;
+            const critical = incidents.filter(i => i.severity === 'Critical').length;
+            const pending = incidents.filter(i => i.status === 'Pending' || i.status === 'Reported').length;
+            const resolved = incidents.filter(i => i.status === 'Resolved').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-critical').innerText = critical;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-resolved').innerText = resolved;
+
+            // Categories Breakdown
+            const categories = ["Fire Emergency", "Road Accident", "Medical Emergency", "Flood", "Building Collapse", "Other Emergencies"];
+            let catHTML = '';
+            categories.forEach(cat => {
+                const count = incidents.filter(i => i.category === cat).length;
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                catHTML += `
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-300 mb-1">
+                            <span>${cat}</span>
+                            <span class="font-bold">${count} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div class="bg-red-600 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('category-breakdown').innerHTML = catHTML;
+
+            // Filter & Search Incidents
+            const searchQuery = document.getElementById('search-input')?.value.toLowerCase() || '';
+            let filtered = incidents.filter(i => {
+                const matchesSearch = i.title.toLowerCase().includes(searchQuery) || i.location.toLowerCase().includes(searchQuery) || i.id.toLowerCase().includes(searchQuery);
+                const matchesSev = selectedSeverityFilter === 'All' || i.severity === selectedSeverityFilter;
+                return matchesSearch && matchesSev;
+            });
+
+            // Table Render
+            let tableHTML = '';
+            filtered.forEach(inc => {
+                let sevBadge = 'text-green-400 bg-green-500/10 border-green-500/30';
+                if(inc.severity === 'Critical') sevBadge = 'text-red-400 bg-red-500/10 border-red-500/30 font-bold animate-pulse';
+                else if(inc.severity === 'High') sevBadge = 'text-red-300 bg-red-500/10 border-red-500/20';
+                else if(inc.severity === 'Medium') sevBadge = 'text-amber-300 bg-amber-500/10 border-amber-500/20';
+
+                let statusColor = 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+                if(inc.status === 'Resolved') statusColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                else if(inc.status === 'In Progress') statusColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                else if(inc.status === 'Pending') statusColor = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+
+                tableHTML += `
+                    <tr class="hover:bg-slate-900/50 transition">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-white">${inc.title}</div>
+                            <div class="text-xs font-mono text-slate-400">${inc.id} • ${inc.peopleAffected} affected</div>
+                        </td>
+                        <td class="py-3 px-4 text-xs text-slate-300">${inc.category}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs border ${sevBadge}">${inc.severity}</span></td>
+                        <td class="py-3 px-4 text-xs text-slate-300">
+                            <a href="https://maps.google.com/?q=${encodeURIComponent(inc.location)}" target="_blank" class="text-blue-400 hover:underline"><i class="fa-solid fa-map-pin mr-1"></i>${inc.location}</a>
+                        </td>
+                        <td class="py-3 px-4">
+                            <select onchange="updateStatus('${inc.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded text-xs px-2 py-1 text-white focus:outline-none focus:border-red-500 ${statusColor}">
+                                <option value="Reported" ${inc.status==='Reported'?'selected':''}>Reported</option>
+                                <option value="Pending" ${inc.status==='Pending'?'selected':''}>Pending</option>
+                                <option value="In Progress" ${inc.status==='In Progress'?'selected':''}>In Progress</option>
+                                <option value="Resolved" ${inc.status==='Resolved'?'selected':''}>Resolved</option>
+                            </select>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-1">
+                            <button onclick="openModal('${inc.id}')" title="View Details" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded text-xs border border-slate-700"><i class="fa-solid fa-eye"></i></button>
+                            <button onclick="duplicateIncident('${inc.id}')" title="Duplicate" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded text-xs border border-slate-700"><i class="fa-solid fa-clone"></i></button>
+                            <button onclick="deleteIncident('${inc.id}')" title="Delete" class="bg-red-950/40 hover:bg-red-900 text-red-400 px-2.5 py-1.5 rounded text-xs border border-red-900"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('incident-table-body').innerHTML = tableHTML || `<tr><td colspan="6" class="text-center py-6 text-slate-500 text-xs">No incidents found matching criteria.</td></tr>`;
+        }
+
+        function submitIncident(e) {
+            e.preventDefault();
+            const newInc = {
+                id: `INC-${Math.floor(100 + Math.random() * 900)}`,
+                title: document.getElementById('rep-title').value,
+                category: document.getElementById('rep-category').value,
+                severity: document.getElementById('rep-severity').value,
+                peopleAffected: parseInt(document.getElementById('rep-people').value) || 1,
+                location: document.getElementById('rep-location').value,
+                contact: document.getElementById('rep-contact').value || 'Anonymous',
+                description: document.getElementById('rep-desc').value,
+                status: 'Reported',
+                timestamp: Date.now()
+            };
+
+            incidents.unshift(newInc);
+            document.getElementById('incident-form').reset();
+            switchTab('dashboard');
+            alert(`Emergency incident ${newInc.id} successfully recorded!`);
+        }
+
+        function updateStatus(id, newStatus) {
+            const inc = incidents.find(i => i.id === id);
+            if(inc) {
+                inc.status = newStatus;
+                renderDashboard();
+            }
+        }
+
+        function deleteIncident(id) {
+            if(confirm(`Are you sure you want to delete incident report ${id}?`)) {
+                incidents = incidents.filter(i => i.id !== id);
+                renderDashboard();
+            }
+        }
+
+        function duplicateIncident(id) {
+            const inc = incidents.find(i => i.id === id);
+            if(inc) {
+                const dup = {
+                    ...inc,
+                    id: `INC-${Math.floor(100 + Math.random() * 900)}`,
+                    title: `${inc.title} (Duplicate)`,
+                    timestamp: Date.now()
+                };
+                incidents.unshift(dup);
+                renderDashboard();
+                alert(`Successfully created duplicate record: ${dup.id}`);
+            }
+        }
+
+        function duplicateCurrentIncident() {
+            if(activeModalId) {
+                duplicateIncident(activeModalId);
+                closeModal();
+            }
+        }
+
+        function openModal(id) {
+            activeModalId = id;
+            const inc = incidents.find(i => i.id === id);
+            if(!inc) return;
+
+            document.getElementById('modal-title').innerText = `Incident Details: ${inc.id}`;
+            document.getElementById('modal-content').innerHTML = `
+                <div class="space-y-2">
+                    <p><strong class="text-white">Title:</strong> ${inc.title}</p>
+                    <p><strong class="text-white">Category:</strong> ${inc.category}</p>
+                    <p><strong class="text-white">Severity:</strong> <span class="text-red-400 font-bold">${inc.severity}</span></p>
+                    <p><strong class="text-white">People Affected:</strong> ${inc.peopleAffected}</p>
+                    <p><strong class="text-white">Location:</strong> <a href="https://maps.google.com/?q=${encodeURIComponent(inc.location)}" target="_blank" class="text-blue-400 underline">${inc.location} <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></a></p>
+                    <p><strong class="text-white">Contact Info:</strong> ${inc.contact}</p>
+                    <p><strong class="text-white">Status:</strong> ${inc.status}</p>
+                    <p><strong class="text-white">Description:</strong> ${inc.description}</p>
+                </div>
+            `;
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            activeModalId = null;
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude.toFixed(4);
+                    const lon = position.coords.longitude.toFixed(4);
+                    document.getElementById('rep-location').value = `${lat}° N, ${lon}° E`;
+                }, () => {
+                    alert("Geolocation failed. Please enter location manually.");
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Initial render
+        renderDashboard();
+    </script>
+</body>
+</html>
